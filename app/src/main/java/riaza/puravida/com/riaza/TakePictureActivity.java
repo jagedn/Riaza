@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -46,6 +47,8 @@ public class TakePictureActivity extends Activity implements SurfaceHolder.Callb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_picture);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         boolean take = getIntent().getExtras().getBoolean("take");
         if( take ) {
             mImageView = (ImageView) findViewById(R.id.imageView);
@@ -69,8 +72,14 @@ public class TakePictureActivity extends Activity implements SurfaceHolder.Callb
             @Override
             public void onPictureTaken(byte[] data, Camera camera)
             {
-                Uri uriTarget = getContentResolver().insert//(Media.EXTERNAL_CONTENT_URI, image);
-                        (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "Riaza");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "Imagen capturada automaticamente");
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+                Uri uriTarget = getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
                 OutputStream imageFileOS;
                 try {

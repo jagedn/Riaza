@@ -36,12 +36,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         int pHour = Integer.parseInt(prefs.getString("sync_frequency","-1"));
         if( pHour != -1) {
             Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            if( pHour <= hour ){
-                c.add(Calendar.HOUR, 24-hour+pHour);
-            }else{
-                c.add(Calendar.HOUR, pHour-hour);
-            }
+            c.add(Calendar.MINUTE, pHour);
 
             Intent intent = new Intent(activity, AlarmReceiver.class);
             sender = PendingIntent.getBroadcast(activity, WHAT, intent, PendingIntent.FLAG_UPDATE_CURRENT);
