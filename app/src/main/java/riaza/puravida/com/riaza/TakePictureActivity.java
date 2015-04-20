@@ -65,48 +65,48 @@ public class TakePictureActivity extends Activity implements SurfaceHolder.Callb
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h)
     {
-        mCamera.startPreview();
-
-        Camera.PictureCallback mCall = new Camera.PictureCallback()
-        {
+        mCamera.autoFocus(new Camera.AutoFocusCallback() {
             @Override
-            public void onPictureTaken(byte[] data, Camera camera)
-            {
+            public void onAutoFocus(boolean success, Camera camera) {
+                Camera.PictureCallback mCall = new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] data, Camera camera) {
 
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "Riaza");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "Imagen capturada automaticamente");
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Images.Media.TITLE, "Riaza");
+                        values.put(MediaStore.Images.Media.DESCRIPTION, "Imagen capturada automaticamente");
+                        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
 
-                Uri uriTarget = getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                        Uri uriTarget = getContentResolver().insert(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-                OutputStream imageFileOS;
-                try {
-                    imageFileOS = getContentResolver().openOutputStream(uriTarget);
-                    imageFileOS.write(data);
-                    imageFileOS.flush();
-                    imageFileOS.close();
+                        OutputStream imageFileOS;
+                        try {
+                            imageFileOS = getContentResolver().openOutputStream(uriTarget);
+                            imageFileOS.write(data);
+                            imageFileOS.flush();
+                            imageFileOS.close();
 
-                    Toast.makeText(TakePictureActivity.this,
-                            "Image saved: " + uriTarget.toString(), Toast.LENGTH_LONG).show();
-                }
-                catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-                //mCamera.startPreview();
+                            Toast.makeText(TakePictureActivity.this,
+                                    "Image saved: " + uriTarget.toString(), Toast.LENGTH_LONG).show();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        //mCamera.startPreview();
 
-                Bitmap bmp = BitmapFactory.decodeByteArray (data, 0, data.length);
-                mImageView.setImageBitmap(bmp);
+                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        mImageView.setImageBitmap(bmp);
 
-                AlarmReceiver.scheduleNext(TakePictureActivity.this);
-                TakePictureActivity.this.finish();
+                        AlarmReceiver.scheduleNext(TakePictureActivity.this);
+                        TakePictureActivity.this.finish();
+                    }
+                };
+                mCamera.takePicture(null, null, mCall);
             }
-        };
+        });
 
-        mCamera.takePicture(null, null, mCall);
     }
 
     int getFrontCameraId() {
@@ -128,11 +128,13 @@ public class TakePictureActivity extends Activity implements SurfaceHolder.Callb
         else
         {
             mCamera = Camera.open(index);
-            Toast.makeText(getApplicationContext(), "With front camera", Toast.LENGTH_LONG).show();
+            mCamera.getParameters().setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
             try {
                 mCamera.setPreviewDisplay(holder);
-
-            } catch (IOException exception) {
+                mCamera.startPreview();
+                Toast.makeText(getApplicationContext(), "With front camera", Toast.LENGTH_SHORT).show();
+            } catch (Exception exception) {
+                Toast.makeText(getApplicationContext(), "Error "+exception.getMessage(), Toast.LENGTH_LONG).show();
                 mCamera.release();
                 mCamera = null;
             }
