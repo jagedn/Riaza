@@ -263,12 +263,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Intent intent = new Intent(this,TakePictureActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("take",true);
-        intent.putExtras(bundle);
-        startActivity(intent);
+        AlarmReceiver.scheduleStart(this);
         this.finish();
     }
 

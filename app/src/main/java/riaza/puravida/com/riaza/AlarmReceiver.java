@@ -31,6 +31,17 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     static final int WHAT = 192837;
 
+    public static void scheduleStart(Activity activity){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MINUTE, 1);
+
+        Intent intent = new Intent(activity, AlarmReceiver.class);
+        sender = PendingIntent.getBroadcast(activity, WHAT, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), sender);
+    }
+
     public static void scheduleNext(Activity activity){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         int pHour = Integer.parseInt(prefs.getString("sync_frequency","-1"));
